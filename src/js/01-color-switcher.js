@@ -17,7 +17,7 @@ stopButton.disabled = true;
 startButton.addEventListener('click', swinchingColor);
 stopButton.addEventListener('click', stopSwinchingColor);
 
-// Функция для кнопки старт
+// Функция для кнопки СТАРТ
 
 function swinchingColor() {
   const intervalDelay = 1000;
@@ -27,13 +27,19 @@ function swinchingColor() {
     document.body.style.backgroundColor = randomColor;
   }, intervalDelay);
 
+  // Деактивируем СТАРТ и деактивируем СТОП
+
   startButton.disabled = true;
   stopButton.disabled = false;
 }
 
-// Функция для кнопки стоп
+// Функция для кнопки СТОП
 
 function stopSwinchingColor() {
   clearInterval(switchingInterval);
+
+  // Активируем СТАРТ и деактивируем СТОП
+
   startButton.disabled = false;
+  stopButton.disabled = true;
 }
