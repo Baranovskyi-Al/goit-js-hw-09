@@ -47,21 +47,67 @@ flatpickr('#datetime-picker', options);
 const callendars = callendar._flatpickr;
 
 // Создаём таймер
+class Timer {
+  constructor({ onTick }) {
+    this.intervalID = null;
+    this.isActive = false;
+    this.onTick = onTick;
+  }
 
-const timer = {
   start() {
+    if (this.isActive) {
+      return;
+    }
     const selectedTime = callendars.selectedDates[0].getTime();
+    this.isActive = true;
 
-    setInterval(() => {
+    this.intervalID = setInterval(() => {
       const currentTime = Date.now();
       const deltaTime = selectedTime - currentTime;
-      const convertedTime = convertMs(deltaTime);
-
-      // Выводим значение оставшегося на страницу
-      updateClock(convertedTime);
+      const convertedTime = this.convertMs(deltaTime);
+      this.onTick(convertedTime);
+      if (deltaTime <= 0) {
+        this.stop();
+      }
     }, 1000);
-  },
-};
+  }
+
+  stop() {
+    clearInterval(this.intervalID);
+    this.isActive = false;
+    const convertedTime = this.convertMs(0);
+    this.onTick(convertedTime);
+  }
+
+  // Функция для подсчета значений
+
+  convertMs(ms) {
+    // Number of milliseconds per unit of time
+    const second = 1000;
+    const minute = second * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
+
+    // Remaining days
+    const days = this.addLeadingZero(Math.floor(ms / day));
+    // Remaining hours
+    const hours = this.addLeadingZero(Math.floor((ms % day) / hour));
+    // Remaining minutes
+    const minutes = this.addLeadingZero(Math.floor(((ms % day) % hour) / minute));
+    // Remaining seconds
+    const seconds = this.addLeadingZero(Math.floor((((ms % day) % hour) % minute) / second));
+
+    return { days, hours, minutes, seconds };
+  }
+
+  // Функция для добавления 0 перед значением
+
+  addLeadingZero(value) {
+    return String(value).padStart(2, '0');
+  }
+}
+
+const timer = new Timer({ onTick: updateClock });
 
 // Вешаем слушатель на кнопку СТАРТ
 
@@ -80,31 +126,4 @@ function updateClock(value) {
   hoursValue.innerHTML = value.hours;
   minutesValue.innerHTML = value.minutes;
   secondsValue.innerHTML = value.seconds;
-}
-
-// // Функция для подсчета значений
-
-function convertMs(ms) {
-  // Number of milliseconds per unit of time
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-
-  // Remaining days
-  const days = addLeadingZero(Math.floor(ms / day));
-  // Remaining hours
-  const hours = addLeadingZero(Math.floor((ms % day) / hour));
-  // Remaining minutes
-  const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
-  // Remaining seconds
-  const seconds = addLeadingZero(Math.floor((((ms % day) % hour) % minute) / second));
-
-  return { days, hours, minutes, seconds };
-}
-
-// Функция для добавления 0 перед значением
-
-function addLeadingZero(value) {
-  return String(value).padStart(2, '0');
 }
