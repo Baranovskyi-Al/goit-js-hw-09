@@ -119,7 +119,7 @@ function onClickTimerStart() {
   timer.start();
 }
 
-// Функция для отрисовки отсавшегося времени на странице
+// Функция для отрисовки оставшегося времени на странице
 
 function updateClock(value) {
   daysValue.innerHTML = value.days;
